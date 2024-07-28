@@ -1,0 +1,83 @@
+{% comment %} Advertisement status (Approved, Rejected, Processing)
+{%endcomment%}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Advertisements</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f9;
+        color: #333;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+      .container {
+        background: #fff;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 800px;
+        box-sizing: border-box;
+      }
+      h1 {
+        font-size: 2rem;
+        color: #007bff;
+        margin-bottom: 1rem;
+        text-align: center;
+      }
+      ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      li {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem;
+        border-bottom: 1px solid #ddd;
+      }
+      li:last-child {
+        border-bottom: none;
+      }
+      a {
+        color: #007bff;
+        text-decoration: none;
+        font-weight: bold;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      .no-ads {
+        text-align: center;
+        color: #666;
+        font-size: 1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Advertisements</h1>
+      <ul>
+        {% for ad in advertisements %}
+        <li>
+          <span>{{ ad.title }} - {{ ad.get_status_display }}</span>
+          <a href="{% url 'update_advertisement_status' ad.id %}"
+            >Update Status</a
+          >
+        </li>
+        {% empty %}
+        <li class="no-ads">No advertisements found.</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </body>
+</html>

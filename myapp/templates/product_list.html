@@ -1,0 +1,87 @@
+{% comment %} Likes, dislikes, favorite, views count {% endcomment %}
+{%comment%} Commenting logic + Complaint {% endcomment %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Product List</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f9;
+        color: #333;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        min-height: 100vh;
+      }
+      h1 {
+        font-size: 2.5rem;
+        color: green;
+        margin: 2rem 0;
+      }
+      ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        width: 100%;
+        max-width: 600px;
+      }
+      li {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        margin-bottom: 1rem;
+        padding: 1rem;
+        transition: background-color 0.3s, box-shadow 0.3s;
+      }
+      .product-number {
+        color: black;
+        font-weight: bold;
+        font-size: 1.2rem;
+        margin-right: 0.5rem;
+      }
+      li:hover {
+        background-color: #e9ecef;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      }
+      a {
+        text-decoration: none;
+        color: red;
+        font-size: 1.2rem;
+        font-weight: bold;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      .home-link {
+        margin: 2rem 0;
+        font-size: 1.2rem;
+      }
+      .home-link a {
+        text-decoration: none;
+        color: #007bff;
+      }
+      .home-link a:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>All Products</h1>
+    <ul>
+      {% for product in products %}
+      <li>
+        <span class="product-number">Product {{ forloop.counter }}.</span>
+        <a href="{% url 'detail' product.id %}">{{ product.name }}</a>
+      </li>
+      {% endfor %}
+    </ul>
+    <div class="home-link">
+      <a href="/">Go to Home Page</a>
+    </div>
+  </body>
+</html>

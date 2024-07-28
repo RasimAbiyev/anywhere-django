@@ -1,0 +1,127 @@
+{% comment %} Working with image. (Watermark, Crop, Thumbnail) {% endcomment %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Upload Image and Watermark</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f9;
+        color: #333;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+      }
+      .container {
+        background: #fff;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 500px;
+      }
+      h1 {
+        margin-top: 0;
+        font-size: 1.5rem;
+        color: #555;
+        text-align: center;
+      }
+      .home-link {
+        margin-bottom: 1.5rem;
+        font-size: 1rem;
+        text-align: center;
+      }
+      .home-link a {
+        color: #007bff;
+        text-decoration: none;
+        font-weight: bold;
+      }
+      .home-link a:hover {
+        text-decoration: underline;
+      }
+      form {
+        display: flex;
+        flex-direction: column;
+      }
+      label {
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+      }
+      input[type="file"],
+      input[type="text"],
+      input[type="submit"] {
+        margin-bottom: 1rem;
+        padding: 0.5rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+      input[type="submit"] {
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+      }
+      input[type="submit"]:hover {
+        background-color: #0056b3;
+      }
+      .instructions {
+        margin-bottom: 1rem;
+        font-size: 0.9rem;
+        color: #666;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="home-link">
+        <a href="/">Go to Home Page</a>
+      </div>
+      <h1>Upload Image and Watermark</h1>
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="instructions">
+          <p>
+            Please upload an image and a watermark. Specify the crop box and
+            thumbnail size in the fields below.
+          </p>
+        </div>
+
+        <label for="image">Choose Image:</label>
+        <input type="file" id="image" name="image" accept="image/*" required />
+
+        <label for="watermark">Choose Watermark:</label>
+        <input
+          type="file"
+          id="watermark"
+          name="watermark"
+          accept="image/*"
+          required
+        />
+
+        <label for="crop_box">Crop Box (left, upper, right, lower):</label>
+        <input
+          type="text"
+          id="crop_box"
+          name="crop_box"
+          placeholder="0,0,100,100"
+          required
+        />
+
+        <label for="thumbnail_size">Thumbnail Size (width,height):</label>
+        <input
+          type="text"
+          id="thumbnail_size"
+          name="thumbnail_size"
+          placeholder="200,200"
+          required
+        />
+
+        <input type="submit" value="Process Image" />
+      </form>
+    </div>
+  </body>
+</html>

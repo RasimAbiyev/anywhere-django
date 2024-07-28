@@ -1,0 +1,115 @@
+{% comment %} Custom User {% endcomment %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>User Profile</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 130vh;
+      }
+      .profile-container {
+        background: #fff;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        max-width: 600px;
+        width: 100%;
+      }
+      .profile-container h1 {
+        text-align: center;
+        margin-bottom: 20px;
+        color: green;
+        margin: 0;
+      }
+      .profile-info {
+        margin-bottom: 15px;
+      }
+      .profile-info label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 5px;
+        color: #555;
+      }
+      .profile-info p {
+        background: #f9f9f9;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+      }
+      .edit-link,
+      .home-link {
+        text-align: center;
+        margin-top: 20px;
+      }
+      .edit-link a,
+      .home-link a {
+        text-decoration: none;
+        background: #007bff;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 5px;
+        transition: background 0.3s;
+      }
+      .edit-link a:hover,
+      .home-link a:hover {
+        background: #0056b3;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="profile-container">
+      <h1>User Profile</h1>
+      <div class="profile-info">
+        <div class="profile-info">
+          <label>Profile Picture:</label>
+          {% if user.profile_picture %}
+          <img
+            src="{{ user.profile_picture.url }}"
+            alt="Profile Picture"
+            style="max-width: 150px; max-height: 150px"
+          />
+          {% else %}
+          <p>No profile picture set</p>
+          {% endif %}
+        </div>
+
+        <label>Username:</label>
+        <p>{{ user.username }}</p>
+      </div>
+      <div class="profile-info">
+        <label>Email:</label>
+        <p>{{ user.email }}</p>
+      </div>
+      <div class="profile-info">
+        <label>First Name:</label>
+        <p>{{ user.first_name }}</p>
+      </div>
+      <div class="profile-info">
+        <label>Last Name:</label>
+        <p>{{ user.last_name }}</p>
+      </div>
+      <div class="profile-info">
+        <label>Bio:</label>
+        <p>{{ user.bio }}</p>
+      </div>
+      <div class="profile-info">
+        <label>Birth Date:</label>
+        <p>{{ user.birth_date }}</p>
+      </div>
+      <div class="edit-link">
+        <a href="{% url 'edit_profile' %}">Edit Profile</a>
+      </div>
+      <div class="home-link">
+        <a href="{% url 'home' %}">Back to Home Page</a>
+      </div>
+    </div>
+  </body>
+</html>

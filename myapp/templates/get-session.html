@@ -1,0 +1,24 @@
+{% comment %} Session {% endcomment %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Get Session</title>
+  </head>
+  <body>
+    <h2>Get Session</h2>
+    <a href="{% url 'get_session' %}">Get Session Data</a>
+    <div id="sessionData"></div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+      $(document).ready(function () {
+        $.ajax({
+          url: "{% url 'get_session' %}",
+          success: function (data) {
+            $("#sessionData").text(data);
+          },
+        });
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,177 @@
+{% extends "admin/base.html" %}
+{% comment %} Customizing Admin Page (Filtering, Adding Icons) {% endcomment %}
+
+{% load static %}
+
+{% block title %}My Custom Admin{% endblock %}
+
+{% block branding %}
+    <h1 id="site-name">
+        <a href="{% url 'admin:index' %}">
+            <i class="fas fa-tachometer-alt"></i> My Custom Admin
+        </a>
+    </h1>
+{% endblock %}
+
+{% block extrahead %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Customizing Admin Page (Filtering, Adding Icons) */
+        body {
+            background-color: #222222;
+            color: yellow;
+        }
+
+        #branding h1 {
+            color: #e74c3c;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+        }
+
+        #branding h1 a {
+            color: #e74c3c;
+            font-size: 24px;
+            text-decoration: none;
+        }
+
+        #branding h1 a:hover {
+            color: lime;
+        }
+
+        .title {
+            color: #e74c3c;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        #site-name {
+            font-size: 24px;
+            color: #4CAF50;
+            display: flex;
+            align-items: center;
+        }
+
+        #site-name a {
+            color: #4CAF50;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        #site-name i {
+            margin-right: 8px;
+        }
+
+        .global-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .global-nav .nav-link {
+            color: #4CAF50;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .global-nav .nav-link i {
+            margin-right: 5px;
+        }
+
+        .global-nav .nav-link:hover {
+            color: #81C784;
+        }
+
+        .header {
+            background-color: #333333;
+            color: #e0e0e0;
+        }
+
+        .header h1 {
+            color: #4CAF50;
+        }
+
+        .navbar {
+            background-color: #333333;
+        }
+
+        .navbar a {
+            color: #e0e0e0;
+        }
+
+        .navbar a:hover {
+            color: #81C784;
+        }
+
+        .module {
+            background-color: #424242;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .module h2 {
+            color: #4CAF50;
+        }
+
+        footer {
+            background-color: #417690;
+            color: #ffffff;
+            padding: 10px;
+            text-align: center;
+            border-top: 1px solid #ddd;
+            margin-top: 20px;
+        }
+
+        footer p {
+            margin: 0;
+        }
+
+        a {
+            color: #3498db;
+        }
+
+        a:hover {
+            color: #2980b9;
+        }
+
+        #site-name a {
+            color: #e74c3c;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        #site-name a:hover {
+            color: #c0392b;
+        }
+
+        /* Buttons */
+        button, .submit-row input[type="submit"] {
+            background-color: #e74c3c;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+        }
+
+        button:hover, .submit-row input[type="submit"]:hover {
+            background-color: #c0392b;
+        }
+    </style>
+{% endblock %}
+
+{% block nav-global %}
+    <div class="global-nav">
+        <a href="{% url 'home' %}" class="nav-link"><i class="fas fa-home"></i> Home</a>
+        <a href="{% url 'admin:logout' %}" class="nav-link"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </div>
+{% endblock %}
+
+{% block content %}
+    {{ block.super }}
+{% endblock %}
+
+{% block footer %}
+    <footer>
+        <p>My Custom Admin Footer &copy; {{ current_year }}</p>
+    </footer>
+{% endblock %}

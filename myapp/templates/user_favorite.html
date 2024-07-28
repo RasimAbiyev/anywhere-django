@@ -1,0 +1,76 @@
+{% comment %} Likes, dislikes, favorite, views count {% endcomment %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Favorites</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+        color: #333;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+      }
+      .container {
+        max-width: 800px;
+        width: 100%;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+        margin: 1rem;
+      }
+      h1 {
+        font-size: 1.75rem;
+        margin-bottom: 1.5rem;
+        color: black;
+        text-align: center;
+      }
+      ul {
+        list-style-type: none;
+        padding: 0;
+      }
+      li {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        border-bottom: 1px solid #ddd;
+        color: red;
+        font-size: 1.5rem;
+      }
+      li:last-child {
+        border-bottom: none;
+      }
+      a {
+        text-decoration: none;
+        color: #007bff;
+        font-weight: bold;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Your Favourite Products</h1>
+      <ul>
+        {% for product in user_favorites %}
+        <li>
+          <span>{{ product.name }}</span>
+          <a href="{% url 'remove_favorite' product.id %}">Remove Favorite</a>
+        </li>
+        {% empty %}
+        <li>No favorites added yet.</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </body>
+</html>

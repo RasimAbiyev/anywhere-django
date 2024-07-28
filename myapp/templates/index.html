@@ -1,0 +1,123 @@
+{% comment %} AJAX {% endcomment %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Promotions</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f9;
+        color: #333;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .container {
+        width: 100%;
+        max-width: 1200px;
+        padding: 2rem;
+        box-sizing: border-box;
+      }
+      h1 {
+        font-size: 2.5rem;
+        color: #007bff;
+        margin-bottom: 1.5rem;
+        text-align: center;
+      }
+      button {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 4px;
+        background-color: #007bff;
+        color: #fff;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        margin-bottom: 1.5rem;
+      }
+      button:hover {
+        background-color: #0056b3;
+      }
+      #dataContainer {
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 1rem;
+        width: 100%;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        overflow-x: auto;
+      }
+      ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      li {
+        border-bottom: 1px solid #ddd;
+        padding: 0.75rem 0;
+        font-size: 1rem;
+      }
+      li:last-child {
+        border-bottom: none;
+      }
+      .error-message {
+        color: #dc3545;
+        font-size: 0.875rem;
+        text-align: center;
+      }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Promotions</h1>
+      <button id="loadData"><i class="fas fa-sync-alt"></i> Load Data</button>
+      <button id="homePageLink" onclick="window.location.href='/'">
+        <i class="fas fa-home"></i> Go to Home Page
+      </button>
+      <div id="dataContainer"></div>
+      <div class="error-message" id="errorMessage"></div>
+    </div>
+
+    <script>
+      $(document).ready(function () {
+        $("#loadData").click(function (e) {
+          e.preventDefault();
+
+          $.ajax({
+            url: "/api/promotions/",
+            method: "GET",
+            success: function (data) {
+              var html = "<ul>";
+              $.each(data, function (index, item) {
+                html +=
+                  "<li><strong>" +
+                  item.title +
+                  "</strong>: " +
+                  item.description +
+                  "</li>";
+              });
+              html += "</ul>";
+              $("#dataContainer").html(html);
+              $("#errorMessage").text("");
+            },
+            error: function (xhr, status, error) {
+              $("#dataContainer").html("");
+              $("#errorMessage").text(
+                "Failed to load promotions. Please try again."
+              );
+            },
+          });
+        });
+      });
+    </script>
+  </body>
+</html>

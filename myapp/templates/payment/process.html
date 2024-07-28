@@ -1,0 +1,113 @@
+{% comment %} Payment Integration {% endcomment %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Payment Process</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f9;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+      .container {
+        background-color: #ffffff;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        width: 90%;
+        max-width: 600px;
+      }
+      h1 {
+        font-size: 1.8rem;
+        color: red;
+        margin-bottom: 1rem;
+      }
+      p {
+        font-size: 1.1rem;
+        color: #333333;
+        margin-bottom: 1.5rem;
+      }
+      .price {
+        font-size: 1.4rem;
+        color: #28a745;
+        font-weight: bold;
+        margin-bottom: 2rem;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 2rem;
+      }
+      table,
+      th,
+      td {
+        border: 1px solid #dddddd;
+      }
+      th,
+      td {
+        padding: 0.75rem;
+        text-align: left;
+      }
+      th {
+        background-color: #f4f4f9;
+      }
+      input[type="submit"] {
+        background-color: #007bff;
+        color: #ffffff;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+      input[type="submit"]:hover {
+        background-color: #0056b3;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Payment Process</h1>
+      <p>Processing payment for your cart items.</p>
+      <p class="price">Total Price: ${{ total_price }}</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Quantity</th>
+            <th>Price</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in cart.items.all %}
+          <tr>
+            <td>{{ item.product.name }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>${{ item.product.price }}</td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="3">Your cart is empty.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <form
+        action="https://www.sandbox.paypal.com/cgi-bin/webscr"
+        method="post"
+      >
+        {{ form.as_p }}
+        <input type="submit" value="Proceed with PayPal" />
+      </form>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,229 @@
+{% comment %} Likes, dislikes, favorite, views count {% endcomment %}
+{%comment%} Commenting logic + Complaint {% endcomment %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Product Detail</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f9f9f9;
+        color: black;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        min-height: 100vh;
+      }
+      .container {
+        max-width: 800px;
+        width: 100%;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+        margin: 2rem;
+      }
+      h1 {
+        font-size: 2.3rem;
+        color: green;
+        margin: 0;
+      }
+      .highlight {
+        color: black;
+      }
+      p {
+        font-size: 1.1rem;
+        margin-bottom: 1rem;
+      }
+      a {
+        color: #007bff;
+        text-decoration: none;
+        font-weight: bold;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      .button {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 4px;
+        background-color: #007bff;
+        color: #fff;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        margin-right: 0.5rem;
+        display: inline-block;
+        text-align: center;
+        text-decoration: none;
+      }
+      .button:hover {
+        background-color: #0056b3;
+      }
+      .form-group {
+        margin-bottom: 1rem;
+      }
+      .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+      }
+      .form-group input,
+      .form-group textarea {
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+      .comments,
+      .complaints {
+        margin-top: 2rem;
+      }
+      .comments ul,
+      .complaints ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      .comments li,
+      .complaints li {
+        background: #f1f1f1;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        position: relative;
+      }
+      .comments li a,
+      .complaints li a {
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
+        color: #e74c3c;
+        font-size: 0.9rem;
+        text-decoration: none;
+      }
+      .comments li a:hover,
+      .complaints li a:hover {
+        text-decoration: none;
+      }
+      .login-link {
+        font-size: 1rem;
+        margin-top: 2rem;
+      }
+      .back-button {
+        display: block;
+        text-align: center;
+        margin-top: 1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      {% if user.is_authenticated %}
+      <h1>
+        {{ product.name }} -
+        <span class="highlight">Product {{ product.id }}</span>
+      </h1>
+      <hr />
+
+      {% if product.image %}
+      <img
+        src="{{ product.image.url }}"
+        alt="{{ product.name }}"
+        style="max-width: 100%; height: auto; margin-bottom: 1rem"
+      />
+      {% endif %}
+      <p><strong>Description:</strong> {{ product.description }}</p>
+      <p><strong>Price:</strong> ${{ product.price }}</p>
+      <a href="{% url 'payment_process' product.id %}" class="button"
+        >Buy Now with PayPal</a
+      >
+      <a href="{% url 'add_to_cart' product.id %}" class="button"
+        >Add to Cart</a
+      >
+
+      <p><strong>Likes:</strong> {{ product.like.count }}</p>
+      <a href="{% url 'like' product.id %}" class="button">Like</a>
+      <a href="{% url 'dislike' product.id %}" class="button">Dislike</a>
+      <a href="{% url 'favorite' product.id %}" class="button">Favorite</a>
+
+      <div class="comments">
+        <h2>Comments</h2>
+        <ul>
+          {% for comment in product.comments.all %}
+          <li>
+            <strong>{{ comment.user.username }}:</strong> {{ comment.content }}
+            <em>({{ comment.created_at }})</em>
+            {% if comment.user == user or user.is_superuser %}
+            <a href="{% url 'delete_comment' comment.id %}">Delete</a>
+            {% endif %}
+          </li>
+          {% empty %}
+          <li>No comments yet.</li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <div class="form-group">
+        <h3>Add a comment</h3>
+        <form method="post">
+          {% csrf_token %} {{ comment_form.as_p }}
+          <button type="submit" name="submit_comment" class="button">
+            Submit Comment
+          </button>
+        </form>
+      </div>
+
+      <div class="form-group">
+        <h3>Add a complaint</h3>
+        <form method="post">
+          {% csrf_token %} {{ complaint_form.as_p }}
+          <button type="submit" name="submit_complaint" class="button">
+            Submit Complaint
+          </button>
+        </form>
+      </div>
+      <div class="complaints">
+        <h3>Complaints</h3>
+        <ul>
+          {% for complaint in product.complaints.all %}
+          <li>
+            <strong>Reason:</strong> {{ complaint.reason }} -
+            <strong>Details:</strong> {{ complaint.details }}
+            <em
+              >(Submitted by: {{ complaint.user.username }} on {{
+              complaint.created_at }})</em
+            >
+            {% if complaint.user == user or user.is_superuser %}
+            <a href="{% url 'delete_complaint' complaint.id %}">Delete</a>
+            {% endif %}
+          </li>
+          {% empty %}
+          <li>No complaints yet.</li>
+          {% endfor %}
+        </ul>
+      </div>
+      <p><strong>Views:</strong> {{ product.views }}</p>
+
+      <form method="post" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <button type="submit" class="button">Logout</button>
+      </form>
+
+      <div class="back-button">
+        <a href="{% url 'product_list' %}" class="button">Back to Products</a>
+      </div>
+
+      {% else %}
+      <p class="login-link">
+        <a href="{% url 'login' %}">Log in</a> to like, dislike, or favorite
+        this product.
+      </p>
+      {% endif %}
+    </div>
+  </body>
+</html>

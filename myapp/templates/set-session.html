@@ -1,0 +1,14 @@
+{% comment %} Session {% endcomment %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Set Session</title>
+  </head>
+  <body>
+    <h2>Set Session</h2>
+    <form action="{% url 'set_session' %}" method="post">
+      {% csrf_token %}
+      <button type="submit">Set Session Data</button>
+    </form>
+  </body>
+</html>

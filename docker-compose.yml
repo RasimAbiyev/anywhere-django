@@ -1,0 +1,80 @@
+# Docker
+# Celery, Redis
+# Send Mail (Dynamic mails, attached images, invoice.pdf)
+version: '3.8'
+
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - default
+
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/code
+      - ./myapp/static:/code/static
+      - ./staticfiles:/code/staticfiles
+    environment:
+      EMAIL_BACKEND: 'django_mail.email_backend.EmailBackend'
+      EMAIL_HOST: 'smtp.gmail.com'
+      EMAIL_PORT: '587'
+      EMAIL_USE_TLS: 'True'
+      EMAIL_USE_SSL: 'False'
+      EMAIL_HOST_USER: 'abiyev.rasim@gmail.com'
+      EMAIL_HOST_PASSWORD: 'znem cjvv iock fbxp'
+      DATABASE_HOST: 'db'
+    depends_on:
+      - db
+      - redis
+    networks:
+      - default
+
+  redis:
+    image: redis:6-alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - default
+
+  celery:
+    build: .
+    command: celery -A myproject worker -l info
+    user: "1000:1000"
+    volumes:
+      - .:/code
+    environment:
+      DATABASE_HOST: 'db'
+    depends_on:
+      - db
+      - redis
+    networks:
+      - default
+
+  tests:
+    build: .
+    command: python manage.py test myapp
+    volumes:
+      - .:/code
+    environment:
+      DATABASE_HOST: 'db'
+    depends_on:
+      - db
+    networks:
+      - default
+
+volumes:
+  postgres_data:
+
+networks:
+  default:
+    driver: bridge
