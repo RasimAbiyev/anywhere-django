@@ -1,5 +1,6 @@
 # Messenger. Sockets. Chat logic.
 import json
+from datetime import datetime
 from channels.generic.websocket import AsyncWebsocketConsumer
 
 class ChatConsumer(AsyncWebsocketConsumer):
@@ -28,6 +29,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         messageId = text_data_json.get("messageId")
         username = text_data_json.get("username")
         user_id = self.user.id
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         if action == 'send':
             self.message_data[messageId] = {'like': 0, 'dislike': 0}
@@ -42,7 +44,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     "likeCount": self.message_data[messageId]['like'],
                     "dislikeCount": self.message_data[messageId]['dislike'],
                     "userHasLiked": False,
-                    "userHasDisliked": False
+                    "userHasDisliked": False,
+                    "timestamp": timestamp
                 }
             )
         elif action in ('toggleLike', 'toggleDislike'):
@@ -99,6 +102,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         messageId = event["messageId"]
         likeCount = event["likeCount"]
         dislikeCount = event["dislikeCount"]
+        timestamp = event["timestamp"]
         await self.send(text_data=json.dumps({
             "action": "send",
             "message": message,
@@ -107,7 +111,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
             "likeCount": likeCount,
             "dislikeCount": dislikeCount,
             "userHasLiked": False,
-            "userHasDisliked": False
+            "userHasDisliked": False,
+            "timestamp": timestamp
         }))
 
     async def deleteMessage(self, event):
