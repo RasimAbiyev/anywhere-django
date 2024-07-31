@@ -216,13 +216,9 @@
     </div>
 
     <script>
-      // JavaScript remains largely the same
-
-      // JavaScript code
 
       const chatSocket = new WebSocket("ws://" + window.location.host + "/");
 
-      // Store user interactions for each message
       const userInteractions = {};
 
       chatSocket.onopen = function (e) {
@@ -253,7 +249,7 @@
               message: messageInput,
               username: "{{ request.user.username }}",
               messageId: messageId,
-              timestamp: new Date().toLocaleTimeString(), // Add timestamp
+              timestamp: new Date().toLocaleTimeString(),
             })
           );
           document.querySelector("#id_message_send_input").value = "";
@@ -299,13 +295,11 @@
           document.querySelector("#id_chat_item_container").scrollTop =
             document.querySelector("#id_chat_item_container").scrollHeight;
 
-          // Initialize user interactions for the new message
           userInteractions[data.messageId] = {
             liked: data.userHasLiked,
             disliked: data.userHasDisliked,
           };
 
-          // Update button states based on user interaction
           updateButtonStates(data.messageId);
         } else if (data.action === "delete") {
           const messageElement = document.getElementById(data.messageId);
@@ -376,7 +370,7 @@
           credentials: "include",
         }).then((response) => {
           if (response.ok) {
-            window.location.href = "/"; // Redirect to home page after logout
+            window.location.href = "/";
           }
         });
       }
