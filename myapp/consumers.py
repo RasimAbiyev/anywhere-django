@@ -33,7 +33,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         if action == 'send':
             self.message_data[messageId] = {'like': 0, 'dislike': 0}
-            self.user_interactions[messageId] = {'liked': False, 'disliked': False}
+            if messageId not in self.user_interactions:
+                self.user_interactions[messageId] = {}
+            self.user_interactions[messageId][user_id] = {'liked': False, 'disliked': False}
             await self.channel_layer.group_send(
                 self.roomGroupName,
                 {
@@ -49,45 +51,48 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 }
             )
         elif action in ('toggleLike', 'toggleDislike'):
-            user_has_interacted = False
+            if messageId not in self.user_interactions:
+                self.user_interactions[messageId] = {}
+            if user_id not in self.user_interactions[messageId]:
+                self.user_interactions[messageId][user_id] = {'liked': False, 'disliked': False}
+
+            user_interaction = self.user_interactions[messageId][user_id]
+
             if action == 'toggleLike':
-                if self.user_interactions[messageId]['liked']:
+                if user_interaction['liked']:
                     self.message_data[messageId]['like'] -= 1
-                    self.user_interactions[messageId]['liked'] = False
+                    user_interaction['liked'] = False
                 else:
-                    if self.user_interactions[messageId]['disliked']:
+                    if user_interaction['disliked']:
                         self.message_data[messageId]['dislike'] -= 1
-                        self.user_interactions[messageId]['disliked'] = False
+                        user_interaction['disliked'] = False
                     self.message_data[messageId]['like'] += 1
-                    self.user_interactions[messageId]['liked'] = True
-                user_has_interacted = True
+                    user_interaction['liked'] = True
             elif action == 'toggleDislike':
-                if self.user_interactions[messageId]['disliked']:
+                if user_interaction['disliked']:
                     self.message_data[messageId]['dislike'] -= 1
-                    self.user_interactions[messageId]['disliked'] = False
+                    user_interaction['disliked'] = False
                 else:
-                    if self.user_interactions[messageId]['liked']:
+                    if user_interaction['liked']:
                         self.message_data[messageId]['like'] -= 1
-                        self.user_interactions[messageId]['liked'] = False
+                        user_interaction['liked'] = False
                     self.message_data[messageId]['dislike'] += 1
-                    self.user_interactions[messageId]['disliked'] = True
-                user_has_interacted = True
+                    user_interaction['disliked'] = True
 
             await self.channel_layer.group_send(
                 self.roomGroupName,
                 {
-                    "type": "updateCounts",
+                    "type": "updateMessage",
                     "messageId": messageId,
                     "likeCount": self.message_data[messageId]['like'],
                     "dislikeCount": self.message_data[messageId]['dislike'],
-                    "userHasLiked": self.user_interactions[messageId]['liked'],
-                    "userHasDisliked": self.user_interactions[messageId]['disliked']
+                    "userHasLiked": user_interaction['liked'],
+                    "userHasDisliked": user_interaction['disliked']
                 }
             )
         elif action == 'delete':
-            if messageId in self.message_data:
-                del self.message_data[messageId]
-                del self.user_interactions[messageId]
+            self.message_data.pop(messageId, None)
+            self.user_interactions.pop(messageId, None)
             await self.channel_layer.group_send(
                 self.roomGroupName,
                 {
@@ -97,42 +102,30 @@ class ChatConsumer(AsyncWebsocketConsumer):
             )
 
     async def sendMessage(self, event):
-        message = event["message"]
-        username = event["username"]
-        messageId = event["messageId"]
-        likeCount = event["likeCount"]
-        dislikeCount = event["dislikeCount"]
-        timestamp = event["timestamp"]
         await self.send(text_data=json.dumps({
-            "action": "send",
-            "message": message,
-            "username": username,
-            "messageId": messageId,
-            "likeCount": likeCount,
-            "dislikeCount": dislikeCount,
-            "userHasLiked": False,
-            "userHasDisliked": False,
-            "timestamp": timestamp
+            'action': 'send',
+            'message': event['message'],
+            'username': event['username'],
+            'messageId': event['messageId'],
+            'likeCount': event['likeCount'],
+            'dislikeCount': event['dislikeCount'],
+            'userHasLiked': event['userHasLiked'],
+            'userHasDisliked': event['userHasDisliked'],
+            'timestamp': event['timestamp']
+        }))
+
+    async def updateMessage(self, event):
+        await self.send(text_data=json.dumps({
+            'action': 'update',
+            'messageId': event['messageId'],
+            'likeCount': event['likeCount'],
+            'dislikeCount': event['dislikeCount'],
+            'userHasLiked': event['userHasLiked'],
+            'userHasDisliked': event['userHasDisliked']
         }))
 
     async def deleteMessage(self, event):
-        messageId = event["messageId"]
         await self.send(text_data=json.dumps({
-            "action": "delete",
-            "messageId": messageId
-        }))
-
-    async def updateCounts(self, event):
-        messageId = event["messageId"]
-        likeCount = event["likeCount"]
-        dislikeCount = event["dislikeCount"]
-        userHasLiked = event["userHasLiked"]
-        userHasDisliked = event["userHasDisliked"]
-        await self.send(text_data=json.dumps({
-            "action": "update",
-            "messageId": messageId,
-            "likeCount": likeCount,
-            "dislikeCount": dislikeCount,
-            "userHasLiked": userHasLiked,
-            "userHasDisliked": userHasDisliked
+            'action': 'delete',
+            'messageId': event['messageId']
         }))

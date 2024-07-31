@@ -38,7 +38,8 @@
       }
       input[type="text"],
       input[type="email"],
-      input[type="password"] {
+      input[type="password"],
+      input[type="file"] {
         padding: 0.75rem;
         margin-bottom: 1rem;
         border: 1px solid #ccc;
@@ -50,7 +51,8 @@
       }
       input[type="text"]:focus,
       input[type="email"]:focus,
-      input[type="password"]:focus {
+      input[type="password"]:focus,
+      input[type="file"]:focus {
         border-color: #007bff;
         outline: none;
       }
@@ -96,8 +98,11 @@
   <body>
     <div class="container">
       <h1>Create an Account</h1>
-      <form method="post" action="{% url 'register' %}">
-        {% csrf_token %} {{ form.as_p }}
+      <form method="post" action="{% url 'register' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <label for="profile_picture">Profile Picture:</label>
+        <input type="file" name="profile_picture" id="profile_picture" />
         <button type="submit">Register</button>
       </form>
       <div class="message">

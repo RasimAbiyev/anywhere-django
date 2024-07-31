@@ -14,7 +14,7 @@
       .username-container {
         color: #0a7c45;
         font-size: 1.3rem;
-    }
+      }
       body {
         font-family: Arial, sans-serif;
         background-color: #f0f2f5;
@@ -194,7 +194,9 @@
   </head>
   <body>
     <div class="container">
-      <div class="username-container" id="username-display">Welcome, {{ request.user.username }}!</div>
+      <div class="username-container" id="username-display">
+        Welcome, {{ request.user.username }}!
+      </div>
       <h1>Welcome to ChatMaster!</h1>
       <div id="id_chat_item_container"></div>
       <div class="message-input-container">
@@ -209,16 +211,19 @@
         <button class="go-home-button" onclick="window.location.href='/'">
           Go to Home Page
         </button>
-        <button class="logout-button" onclick="logout()">
-          Logout
-        </button>
+        <button class="logout-button" onclick="logout()">Logout</button>
       </div>
     </div>
 
     <script>
       // JavaScript remains largely the same
 
+      // JavaScript code
+
       const chatSocket = new WebSocket("ws://" + window.location.host + "/");
+
+      // Store user interactions for each message
+      const userInteractions = {};
 
       chatSocket.onopen = function (e) {
         console.log("The connection was set up successfully!");
@@ -262,21 +267,46 @@
           div.className = "chat-message";
           div.id = data.messageId;
           div.innerHTML = `
-                    <div class="chat-message-content">
-                        <span><strong>${data.username}:</strong> ${data.message}</span>
-                        <span class="timestamp">${data.timestamp}</span>
-                        <div>
-                            <button class="like" onclick="toggleLike('${data.messageId}', this)" id="${data.messageId}-like-button">Like</button>
-                            <span class="like-count" id="${data.messageId}-like-count">${data.likeCount}</span>
-                            <button class="dislike" onclick="toggleDislike('${data.messageId}', this)" id="${data.messageId}-dislike-button">Dislike</button>
-                            <span class="dislike-count" id="${data.messageId}-dislike-count">${data.dislikeCount}</span>
-                            <button class="delete" onclick="deleteMessage('${data.messageId}')">Delete</button>
-                        </div>
-                    </div>
-                `;
+            <div class="chat-message-content">
+                <span><strong>${data.username}:</strong> ${data.message}</span>
+                <span class="timestamp">${data.timestamp}</span>
+                <div>
+                    <button class="like" onclick="toggleLike('${
+                      data.messageId
+                    }', this)" id="${data.messageId}-like-button">${
+            data.username === "{{ request.user.username }}" ? "Like" : "Like"
+          }</button>
+                    <span class="like-count" id="${
+                      data.messageId
+                    }-like-count">${data.likeCount}</span>
+                    <button class="dislike" onclick="toggleDislike('${
+                      data.messageId
+                    }', this)" id="${data.messageId}-dislike-button">${
+            data.username === "{{ request.user.username }}"
+              ? "Dislike"
+              : "Dislike"
+          }</button>
+                    <span class="dislike-count" id="${
+                      data.messageId
+                    }-dislike-count">${data.dislikeCount}</span>
+                    <button class="delete" onclick="deleteMessage('${
+                      data.messageId
+                    }')">Delete</button>
+                </div>
+            </div>
+        `;
           document.querySelector("#id_chat_item_container").appendChild(div);
           document.querySelector("#id_chat_item_container").scrollTop =
             document.querySelector("#id_chat_item_container").scrollHeight;
+
+          // Initialize user interactions for the new message
+          userInteractions[data.messageId] = {
+            liked: data.userHasLiked,
+            disliked: data.userHasDisliked,
+          };
+
+          // Update button states based on user interaction
+          updateButtonStates(data.messageId);
         } else if (data.action === "delete") {
           const messageElement = document.getElementById(data.messageId);
           if (messageElement) {
@@ -295,6 +325,11 @@
           if (dislikeCountElement) {
             dislikeCountElement.innerText = data.dislikeCount;
           }
+          if (userInteractions[data.messageId]) {
+            userInteractions[data.messageId].liked = data.userHasLiked;
+            userInteractions[data.messageId].disliked = data.userHasDisliked;
+          }
+          updateButtonStates(data.messageId);
         }
       };
 
@@ -303,7 +338,7 @@
       }
 
       function toggleLike(messageId, button) {
-        const hasLiked = button.classList.contains("liked");
+        const hasLiked = userInteractions[messageId]?.liked;
         chatSocket.send(
           JSON.stringify({
             action: hasLiked ? "toggleLike" : "toggleLike",
@@ -313,7 +348,7 @@
       }
 
       function toggleDislike(messageId, button) {
-        const hasDisliked = button.classList.contains("disliked");
+        const hasDisliked = userInteractions[messageId]?.disliked;
         chatSocket.send(
           JSON.stringify({
             action: hasDisliked ? "toggleDislike" : "toggleDislike",
@@ -332,34 +367,52 @@
       }
 
       function logout() {
-        fetch('/logout/', {
-          method: 'POST',
+        fetch("/logout/", {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': getCookie('csrftoken'),
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCookie("csrftoken"),
           },
-          credentials: 'include',
-        })
-        .then(response => {
+          credentials: "include",
+        }).then((response) => {
           if (response.ok) {
-            window.location.href = '/'; // Redirect to home page after logout
+            window.location.href = "/"; // Redirect to home page after logout
           }
         });
       }
 
       function getCookie(name) {
         let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-          const cookies = document.cookie.split(';');
+        if (document.cookie && document.cookie !== "") {
+          const cookies = document.cookie.split(";");
           for (let i = 0; i < cookies.length; i++) {
             const cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            if (cookie.substring(0, name.length + 1) === name + "=") {
+              cookieValue = decodeURIComponent(
+                cookie.substring(name.length + 1)
+              );
               break;
             }
           }
         }
         return cookieValue;
+      }
+
+      function updateButtonStates(messageId) {
+        const likeButton = document.getElementById(messageId + "-like-button");
+        const dislikeButton = document.getElementById(
+          messageId + "-dislike-button"
+        );
+        if (userInteractions[messageId]?.liked) {
+          likeButton.classList.add("liked");
+        } else {
+          likeButton.classList.remove("liked");
+        }
+        if (userInteractions[messageId]?.disliked) {
+          dislikeButton.classList.add("disliked");
+        } else {
+          dislikeButton.classList.remove("disliked");
+        }
       }
     </script>
   </body>
